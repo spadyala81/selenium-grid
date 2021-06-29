@@ -43,26 +43,34 @@ Resources:
       UserData:
         Fn::Base64:
           Fn::Sub: |
-            #!/bin/bash
+            #!/bin/bash -xe
+            exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
             sudo yum update
             sudo yum install java -y
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-            . ~/.nvm/nvm.sh
-            nvm install node
-            node -e "console.log('Running Node.js ' + process.version)"
+            echo "java installation completed"
+
+            sudo yum install git -y
+            echo "git installation completed"
+
+            sudo yum install -y gcc-c++ make 
+            curl -sL https://rpm.nodesource.com/setup_14.x | sudo -E bash -           
+            sudo yum install -y nodejs 
+            echo "nodejs installation completed"
+
             cd /home/ec2-user
             sudo curl https://intoli.com/install-google-chrome.sh | bash
             sudo mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
-            google-chrome – version && which google-chrome
+            echo "chrome browser installation completed"
+
             mkdir /home/ec2-user/drivers
             cd /home/ec2-user/drivers
             sudo wget https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar
             sudo wget https://chromedriver.storage.googleapis.com/80.0.3987.106/chromedriver_linux64.zip
             sudo unzip chromedriver_linux64.zip
             sudo mv chromedriver /usr/bin/chromedriver
-            chromedriver – version
-            sudo yum update
-            sudo yum install git -y
+            echo " drivers installation completed"
+
+            cd /home/ec2-user
             sudo git clone https://spadyala81:P%4055word81@github.com/spadyala81/selenium-grid.git
             cd selenium-grid
             npm install
